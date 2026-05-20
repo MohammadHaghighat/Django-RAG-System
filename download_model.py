@@ -6,9 +6,14 @@ os.environ["HF_HUB_ETAG_TIMEOUT"]="300"
 os.environ["HF_HUB_DOWNLOAD_TIMEOUT"]="120"
 
 from langchain_huggingface import HuggingFaceEmbeddings
+from huggingface_hub import snapshot_download
 
 print("Downloading model from Iranian Mirror... (Please be patient)")
 try:
-    HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+    path = snapshot_download(
+        repo_id="sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+        # این خط باعث میشه فقط فایل‌های ضروری مدل دانلود بشن (حدود 470 مگ)
+        allow_patterns=["*.safetensors", "*.json", "*.txt", "*.md"]
+    )
 except Exception as e:
     print(f"\n❌error : {e}")
