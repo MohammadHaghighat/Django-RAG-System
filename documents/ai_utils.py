@@ -60,18 +60,38 @@ def get_answer_from_ai(question):
         api_key=os.getenv("OPENROUTER_API_KEY"),
     )
     
-    prompt = ChatPromptTemplate.from_template("""
+    prompt_template = ChatPromptTemplate.from_template("""
     Answer the user's question based only on the following context. 
     If you don't know the answer, just say "اطلاعاتی در این باره در اسناد یافت نشد.".
+    
     Context: {context}
+    
     Question: {input}
     """)
     
     vectorstore = Chroma(persist_directory=CHROMA_PERSIST_DIR, embedding_function=embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 3})
     
-    document_chain = create_stuff_documents_chain(llm, prompt)
+    document_chain = create_stuff_documents_chain(llm, prompt_template)
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
     
+    # تغییر اصلی اینجاست!
     response = retrieval_chain.invoke({"input": question})
-    return response["answer"]
+    
+    # استخراج نام اسناد منبع
+    source_documents = []
+    if "context" in response and response["context"]:
+        for doc in response["context"]:
+            # چون ما doc_id رو در metadata ذخیره کردیم، ازش استفاده می‌کنیم
+            if 'doc_id' in doc.metadata:
+                source_documents.append(f"سند شماره {doc.metadata['doc_id']}")
+    
+    # ایجاد یک لیست از نام‌های منحصر به فرد
+    unique_sources = list(set(source_documents))
+
+    # برگرداندن یک دیکشنری کامل
+    return {
+        "answer": response["answer"],
+        "sources": unique_sources,
+        "prompt": prompt_template.format(context=response.get("context", ""), input=question)
+    }
