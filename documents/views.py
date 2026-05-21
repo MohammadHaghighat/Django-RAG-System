@@ -7,7 +7,19 @@ from .models import QAHistory, Document
 
 # این تابع جدید برای نمایش صفحه چت است
 def chat_view(request):
-    return render(request, 'documents/chat.html')
+    # خواندن تمام تاریخچه از دیتابیس به ترتیب زمان
+    history = QAHistory.objects.all().order_by('created_at')
+    
+    # تبدیل به یک لیست برای ارسال به فرانت‌اند
+    chat_history = []
+    for item in history:
+        chat_history.append({
+            "question": item.question,
+            "answer": item.answer
+        })
+        
+    # ارسال لیست تاریخچه به قالب HTML
+    return render(request, 'documents/chat.html', {'chat_history': chat_history})
 
 class AskQuestionAPIView(APIView):
     def post(self, request, *args, **kwargs):

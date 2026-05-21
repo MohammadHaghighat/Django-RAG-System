@@ -6,7 +6,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close-button');
     const modalSources = document.getElementById('modal-sources');
     const modalPrompt = document.getElementById('modal-prompt');
-
+    
+    const historyData = JSON.parse(document.getElementById('chat-history-data').textContent);
+    historyData.forEach(item => {
+        // چاپ سوال کاربر
+        addMessage(item.question, 'user');
+        
+        // چاپ جواب هوش مصنوعی
+        const botDiv = document.createElement('div');
+        botDiv.className = 'message bot';
+        botDiv.innerHTML = marked.parse(item.answer); // تبدیل مارک‌داون
+        chatMessages.appendChild(botDiv);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
     chatForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const question = messageInput.value.trim();
