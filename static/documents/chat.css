@@ -118,16 +118,33 @@ body {
     font-family: 'Vazirmatn', sans-serif;
     font-size: 15px;
 }
+/* استایل مدرن دکمه ارسال با فونت وزیر و انیمیشن کلیک */
 #chat-form button {
     background: #128c7e;
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 45px;
+    border-radius: 20px; /* هماهنگ با کادر ورود متن */
+    padding: 0 24px;
     height: 45px;
     margin-right: 10px;
     cursor: pointer;
-    font-size: 18px;
+    font-family: 'Vazirmatn', sans-serif; /* اعمال فونت وزیر به دکمه */
+    font-size: 15px;
+    font-weight: bold;
+    box-shadow: 0 2px 6px rgba(18, 140, 126, 0.2);
+    transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#chat-form button:hover {
+    background: #0b685d;
+    box-shadow: 0 4px 10px rgba(11, 104, 93, 0.3);
+}
+
+#chat-form button:active {
+    transform: scale(0.95); /* انیمیشن فشرده شدن دکمه هنگام کلیک */
 }
 
 /* Modal Styles */
@@ -167,4 +184,27 @@ body {
     word-wrap: break-word;
     max-height: 200px;
     overflow-y: auto;
+}
+/* استایل دکمه مدیریت اسناد در هدر */
+.admin-link {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    text-decoration: none;
+    background: rgb(7 94 84);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    transition: background 0.2s, transform 0.1s;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.admin-link:hover {
+    background: #0b685d;
+}
+
+.admin-link:active {
+    transform: scale(0.95);
 }

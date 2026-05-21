@@ -66,7 +66,7 @@ def get_answer_from_ai(question):
     
     prompt_template = ChatPromptTemplate.from_template("""
     Answer the user's question based only on the following context. 
-    If you don't know the answer, just say "اطلاعاتی در این باره در اسناد یافت نشد.".
+    If you don't know the answer, just say "اطلاعاتی در اسناد یافت نشد.".
     
     Context: {context}
     

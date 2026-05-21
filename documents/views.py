@@ -5,25 +5,22 @@ from rest_framework import status
 from .ai_utils import get_answer_from_ai
 from .models import QAHistory, Document
 
-# این تابع جدید برای نمایش صفحه چت است
+# ۱. نمایش صفحه چت و تاریخچه
 def chat_view(request):
-    # خواندن تمام تاریخچه از دیتابیس به ترتیب زمان
     history = QAHistory.objects.all().order_by('created_at')
     
-    # تبدیل به یک لیست برای ارسال به فرانت‌اند
     chat_history = []
     for item in history:
         chat_history.append({
             "question": item.question,
             "answer": item.answer,
-            # این دو خط اضافه شد:
             "sources": item.sources or [], 
             "prompt": item.prompt or ""
         })
         
-    # ارسال لیست تاریخچه به قالب HTML
     return render(request, 'documents/chat.html', {'chat_history': chat_history})
 
+# ۲. API پرسش و پاسخ
 class AskQuestionAPIView(APIView):
     def post(self, request, *args, **kwargs):
         question = request.data.get('question')
@@ -31,30 +28,28 @@ class AskQuestionAPIView(APIView):
             return Response({"error": "Question not provided"}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            # result الان یک دیکشنری کامل است
+            # دریافت پاسخ از هوش مصنوعی
             result = get_answer_from_ai(question)
             
-            # برای ذخیره در تاریخچه، فقط جواب رو نیاز داریم
-            QAHistory.objects.create(question=question, answer=result["answer"])
-
-            # برای نمایش اسم سند، باید از دیتابیس بگیریمش
+            # استخراج اسم اسناد واقعی از روی آیدی‌ها
             source_names = []
             for source_id_str in result.get("sources", []):
                 try:
-                    # استخراج آیدی عددی از "سند شماره X"
                     doc_id = int(source_id_str.split(" ")[-1])
                     document = Document.objects.get(pk=doc_id)
                     source_names.append(document.title)
                 except (ValueError, Document.DoesNotExist):
                     continue
+            
+            # === فقط و فقط یک بار ذخیره کامل در دیتابیس ===
             QAHistory.objects.create(
-                question=question, 
+                question=question,
                 answer=result["answer"],
-                sources=source_names,  # ذخیره اسناد
-                prompt=result["prompt"] # ذخیره پرامپت
+                sources=source_names,
+                prompt=result["prompt"]
             )
+            # ============================================
 
-            # دیکشنری نهایی برای ارسال به فرانت‌اند
             final_response = {
                 "answer": result["answer"],
                 "sources": source_names,
