@@ -5,6 +5,10 @@ os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_ENDPOINT"] = "https://hf.devneeds.ir" 
 
+# این دو خط رو حتماً اضافه کن (پورت رو بر اساس فیلترشکن خودت تنظیم کن: مثلاً 10808 یا 7890)
+os.environ["http_proxy"] = "http://127.0.0.1:10808" 
+os.environ["https_proxy"] = "http://127.0.0.1:10808"
+
 from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_huggingface import HuggingFaceEmbeddings
@@ -55,7 +59,7 @@ def delete_document_from_chroma(doc_id):
 
 def get_answer_from_ai(question):
     llm = ChatOpenAI(
-        model="meta-llama/llama-3-8b-instruct:free",
+        model= "openai/gpt-oss-120b:free",
         base_url="https://openrouter.ai/api/v1",
         api_key=os.getenv("OPENROUTER_API_KEY"),
     )
@@ -80,18 +84,26 @@ def get_answer_from_ai(question):
     
     # استخراج نام اسناد منبع
     source_documents = []
+    clean_contexts = [] # برای تمیز کردن متن‌های ارسالی به فرانت‌اند
+    
     if "context" in response and response["context"]:
         for doc in response["context"]:
-            # چون ما doc_id رو در metadata ذخیره کردیم، ازش استفاده می‌کنیم
+            # تمیز کردن متن (کشیدن بیرون از ساختار LangChain)
+            clean_contexts.append(doc.page_content)
+            
             if 'doc_id' in doc.metadata:
                 source_documents.append(f"سند شماره {doc.metadata['doc_id']}")
     
-    # ایجاد یک لیست از نام‌های منحصر به فرد
     unique_sources = list(set(source_documents))
 
-    # برگرداندن یک دیکشنری کامل
+    # چسباندن متن‌های تمیز شده به هم
+    formatted_context_for_display = "\n\n---\n\n".join(clean_contexts)
+    
+    # ساخت پرامپت نهایی فقط برای نمایش زیبا در فرانت‌اند
+    display_prompt = prompt_template.format(context=formatted_context_for_display, input=question)
+
     return {
         "answer": response["answer"],
         "sources": unique_sources,
-        "prompt": prompt_template.format(context=response.get("context", ""), input=question)
+        "prompt": display_prompt
     }

@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چت با اسناد</title>
+    <link rel="stylesheet" href="{% static 'documents/chat.css' %}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h2>سامانه پرسش از اسناد</h2>
+            <p>از اسنادی که آپلود کرده‌اید، سوال بپرسید.</p>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <!-- پیام‌های چت اینجا اضافه می‌شوند -->
+        </div>
+        <div class="chat-input-form">
+            <form id="chat-form">
+                {% csrf_token %} 
+                <input type="text" id="message-input" placeholder="سوال خود را تایپ کنید..." autocomplete="off">
+                <button type="submit">ارسال</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal برای نمایش اطلاعات بیشتر -->
+    <div id="info-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h3>اطلاعات تکمیلی</h3>
+            <h4>اسناد منبع:</h4>
+            <ul id="modal-sources"></ul>
+            <h4>پرامپت ارسالی به مدل:</h4>
+            <pre id="modal-prompt"></pre>
+        </div>
+    </div>
+    
+    <script src="{% static 'documents/chat.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</body>
+</html>
