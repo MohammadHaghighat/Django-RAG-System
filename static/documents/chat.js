@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = document.querySelector('.close-button');
     const modalSources = document.getElementById('modal-sources');
     const modalPrompt = document.getElementById('modal-prompt');
-    
+
     const historyData = JSON.parse(document.getElementById('chat-history-data').textContent);
     historyData.forEach(item => {
         // چاپ سوال کاربر
@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const botDiv = document.createElement('div');
         botDiv.className = 'message bot';
         botDiv.innerHTML = marked.parse(item.answer); // تبدیل مارک‌داون
+         // --- این بخش اضافه شد تا دکمه اطلاعات برای پیام‌های قدیمی هم بیاد ---
+        if (item.sources && item.sources.length > 0) {
+            const infoButton = document.createElement('button');
+            infoButton.className = 'info-button';
+            infoButton.innerText = 'i';
+            infoButton.onclick = () => showInfoModal(item.sources, item.prompt);
+            botDiv.appendChild(infoButton);
+        }
         chatMessages.appendChild(botDiv);
     });
     chatMessages.scrollTop = chatMessages.scrollHeight;

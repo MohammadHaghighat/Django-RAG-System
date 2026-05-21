@@ -15,7 +15,10 @@ def chat_view(request):
     for item in history:
         chat_history.append({
             "question": item.question,
-            "answer": item.answer
+            "answer": item.answer,
+            # این دو خط اضافه شد:
+            "sources": item.sources or [], 
+            "prompt": item.prompt or ""
         })
         
     # ارسال لیست تاریخچه به قالب HTML
@@ -44,6 +47,12 @@ class AskQuestionAPIView(APIView):
                     source_names.append(document.title)
                 except (ValueError, Document.DoesNotExist):
                     continue
+            QAHistory.objects.create(
+                question=question, 
+                answer=result["answer"],
+                sources=source_names,  # ذخیره اسناد
+                prompt=result["prompt"] # ذخیره پرامپت
+            )
 
             # دیکشنری نهایی برای ارسال به فرانت‌اند
             final_response = {

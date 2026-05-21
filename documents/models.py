@@ -58,9 +58,14 @@ class Document(models.Model):
         super().delete(*args, **kwargs)
 
 class QAHistory(models.Model):
-    # (کدهای این بخش دست نخورده باقی ماند)
     question = models.TextField(verbose_name="پرسش کاربر")
     answer = models.TextField(verbose_name="پاسخ هوش مصنوعی")
+    
+    # === این دو فیلد جدید اضافه شدند ===
+    sources = models.JSONField(blank=True, null=True, verbose_name="اسناد منبع")
+    prompt = models.TextField(blank=True, null=True, verbose_name="پرامپت ارسالی")
+    # ==================================
+    
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
 
     class Meta:
