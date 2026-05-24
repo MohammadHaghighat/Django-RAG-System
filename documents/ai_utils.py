@@ -1,6 +1,9 @@
 import os
+import httpx  # <--- این خط حتماً بالای فایل اضافه بشه
 from django.conf import settings
 
+os.environ["HF_HUB_OFFLINE"] = "1"
+os.environ["TRANSFORMERS_OFFLINE"] = "1"
 
 from langchain_community.document_loaders import Docx2txtLoader, PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
@@ -10,10 +13,16 @@ from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_classic.chains import create_retrieval_chain
 from langchain_classic.chains.combine_documents import create_stuff_documents_chain
+LOCAL_MODEL_PATH = os.path.join(settings.BASE_DIR, "local_model_files")
 
-MODEL_PATH = os.path.join(settings.BASE_DIR, "local_model_files")
+# اگر کاربر فایل‌ها رو دستی دانلود کرده باشه، از روی هارد می‌خونه، وگرنه از اینترنت می‌گیره
+if os.path.exists(LOCAL_MODEL_PATH) and os.listdir(LOCAL_MODEL_PATH):
+    MODEL_SOURCE = LOCAL_MODEL_PATH
+else:
+    MODEL_SOURCE = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
 
-embeddings = HuggingFaceEmbeddings(model_name=MODEL_PATH)
+embeddings = HuggingFaceEmbeddings(model_name=MODEL_SOURCE)
+
 CHROMA_PERSIST_DIR = os.path.join(settings.BASE_DIR, "chroma_db")
 
 # تغییر 1: اضافه شدن doc_id به ورودی تابع
@@ -53,13 +62,15 @@ def delete_document_from_chroma(doc_id):
         print(f"Error deleting from ChromaDB: {e}")
 
 def get_answer_from_ai(question):    
-    os.environ["http_proxy"] = "http://host.docker.internal:10808" 
-    os.environ["https_proxy"] = "http://host.docker.internal:10808"
+    # کابل اختصاصی فیلترشکن شما برای وصل شدن به OpenRouter
+    proxy_url = "http://host.docker.internal:10808"
+    custom_client = httpx.Client(proxy=proxy_url)
     
     llm = ChatOpenAI(
         model= "openai/gpt-oss-120b:free",
         base_url="https://openrouter.ai/api/v1",
         api_key=os.getenv("OPENROUTER_API_KEY"),
+        http_client=custom_client  # <--- اتصال فیلترشکن به مدل
     )
     
     prompt_template = ChatPromptTemplate.from_template("""
