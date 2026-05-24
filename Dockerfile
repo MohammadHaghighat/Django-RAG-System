@@ -1,4 +1,4 @@
-# ۱. دریافت پایتون پایدار
+# ۱. دریافت پایتون پایدار از میرور ایرانی (برای دور زدن تحریم‌ها)
 FROM docker.devneeds.ir/python:3.10-slim-bookworm
 
 # ۲. تنظیمات محیطی
@@ -9,17 +9,12 @@ WORKDIR /app
 # ۳. کپی فایل نیازمندی‌های تمیز شده
 COPY requirements.txt /app/
 
-# ۴. تنظیم پروکسی به صورت استاندارد + استثنا کردن سایت PyTorch برای جلوگیری از ارور SSL
-ENV http_proxy="http://host.docker.internal:10808"
-ENV https_proxy="http://host.docker.internal:10808"
-ENV no_proxy="download.pytorch.org"
+# ۴. نصب پکیج‌ها از میرور ایرانی + دریافت نسخه فوق سبک Torch (CPU-only) برای سرعت بالا
+RUN pip install --no-cache-dir --default-timeout=200 -i https://pypi.devneeds.ir/simple/ -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 
-# ۵. نصب پکیج‌ها (الان سایت PyTorch رو بدون فیلترشکن و بدون ارور باز میکنه!)ص
-RUN pip install --no-cache-dir -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
-
-# ۶. کپی کدهای پروژه
+# ۵. کپی کدهای پروژه
 COPY . /app/
 EXPOSE 8000
 
-# ۷. اجرا
+# ۶. اجرا
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

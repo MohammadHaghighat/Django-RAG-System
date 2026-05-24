@@ -11,6 +11,7 @@ __pycache__/
 # Django
 db.sqlite3
 media/
+documents-files/
 
 # AI & DB
 chroma_db/

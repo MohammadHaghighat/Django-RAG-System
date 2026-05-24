@@ -9,7 +9,9 @@ services:
     env_file:
       - .env
     extra_hosts:
-      - "host.docker.internal:host-gateway" # این خط اجازه میده داکر به فیلترشکن سیستم شما وصل بشه
+      - "host.docker.internal:host-gateway" # این خط اجازه میده داکر به فیلترشکن سیستم وصل بشه
+    # این خط جادویی باعث میشه دیتابیسِ خالی، اتوماتیک ساخته بشه و سرور بالا بیاد
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     restart: always
 
 volumes:
