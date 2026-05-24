@@ -1,0 +1,23 @@
+# Environments
+env/
+venv/
+RAG-system/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Django
+db.sqlite3
+media/
+
+# AI & DB
+chroma_db/
+.chroma/
+local_model_files/
+
+# VS Code
+.vscode/
+
+local_model_files

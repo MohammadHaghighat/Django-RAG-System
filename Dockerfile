@@ -1,5 +1,5 @@
 # ۱. دریافت پایتون پایدار
-FROM docker.arvancloud.ir/python:3.10-slim-bookworm
+FROM docker.devneeds.ir/python:3.10-slim-bookworm
 
 # ۲. تنظیمات محیطی
 ENV PYTHONDONTWRITEBYTECODE 1
