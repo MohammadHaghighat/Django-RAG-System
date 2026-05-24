@@ -2,5 +2,5 @@ POST http://127.0.0.1:8000/api/ask/
 Content-Type: application/json
 
 {
-    "question": "پایتخت کشور فرانسه کجاست؟"
+    "question": "بزرگترین تولید کننده قهوه کدام کشور است؟"
 }
