@@ -19,7 +19,7 @@ This project is an advanced Retrieval-Augmented Generation (RAG) system built wi
 
 1. Environment Variables:
 Create a .env file in the root directory containing your OpenRouter API key:
-OPENROUTER_API_KEY=sk-or-v1-...
+`OPENROUTER_API_KEY=sk-or-v1-...`
 
 2. Run with Docker:
 Execute the following command in the root directory:
